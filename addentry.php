@@ -1,5 +1,4 @@
 <?php 
-
 global $wpdb;
 $tablename = $wpdb->prefix."docscloud";
 // Add record
@@ -10,10 +9,18 @@ if(isset($_POST['but_submit'])){
 	//$tablename = $wpdb->prefix."docscloud";
 
 	if($auth_id != '' && $auth_token != ''){
-		$check_data = $wpdb->get_results("SELECT * FROM ".$tablename." WHERE auth_id='".$auth_id."' ");
+		
+		$check_data = $wpdb->get_results($wpdb->prepare("SELECT * FROM $tablename WHERE auth_id='%s'",$auth_id));
 	    if(count($check_data) == 0){
-	        $insert_sql = "INSERT INTO ".$tablename."(auth_id,auth_token) values('".$auth_id."','".$auth_token."') ";
-	        $wpdb->query($insert_sql);
+				$data = array(
+					'auth_id' => $auth_id, 
+					'auth_token' => $auth_token
+					
+				);
+				$format = array('%s','%s');
+				$wpdb->insert($tablename,$data,$format);
+	        // $insert_sql = "INSERT INTO ".$tablename."(auth_id,auth_token) values('".$auth_id."','".$auth_token."') ";
+	        // $wpdb->query($insert_sql);
 	        echo "Authentication save sucessfully.";
 	    }
 	}
@@ -24,7 +31,8 @@ if(isset($_POST['but_submit'])){
 		<div class="wrap">
 			<h1 class="add-new-user">Add Auth Details</h1>
 			<?php
-			$check_data_e = $wpdb->get_results("SELECT * FROM ".$tablename."");
+				
+			$check_data_e = $wpdb->get_results($wpdb->prepare("SELECT * FROM $tablename"));
 			if(count($check_data_e) == 0){
 			?>
 			<form method='post' action='' class="validate" novalidate="novalidate" id="createuser">

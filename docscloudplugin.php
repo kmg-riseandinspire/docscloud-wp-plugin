@@ -7,7 +7,8 @@
    Author: Rise & Inspire Techlabs LLP
    Author URI: #
  */
-
+//Exit if want to open file directly
+if(!defined('ABSPATH')) exit;
 // Create a new table
 function docscloud_table(){
 	global $wpdb;
@@ -43,7 +44,7 @@ register_activation_hook( __FILE__, 'docscloud_table' );
 // Add menu
 function docscloud_menu_n() {
 
-    add_menu_page("Docscloud", "Docscloud","manage_options", "myplugin", "docscloud_displayList_n",plugins_url('/docsclouds/img/icon.png'));
+    add_menu_page("Docscloud", "Docscloud","manage_options", "myplugin", "docscloud_displayList_n",esc_url(plugins_url('/docsclouds/img/icon.png', dirname(__FILE__))));
     add_submenu_page("myplugin","Auth List", "Auth List","manage_options", "authdetails", "docscloud_displayList_n");
     add_submenu_page("myplugin","Add Auth Details", "Add Auth Details","manage_options", "addauth", "docscloud_addEntry_n");
 	add_submenu_page("myplugin","Form List", "Form List","manage_options", "formlist", "docscloud_formList_n");

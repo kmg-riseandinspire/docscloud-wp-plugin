@@ -5,7 +5,7 @@ $tablename = $wpdb->prefix."dcforms";
 $auth_tbl = $wpdb->prefix."docscloud";
 // Add record
 if(isset($_POST['ref_form_list'])){
-	$entriesList = $wpdb->get_results("SELECT * FROM ".$auth_tbl." order by id desc");
+	$entriesList = $wpdb->get_results($wpdb->prepare("SELECT * FROM $auth_tbl order by id desc"));
 	if(count($entriesList) > 0){
 		foreach($entriesList as $entry){
 			$url = 'https://app.docscloud.io/api/v2/get-form-list';
@@ -33,16 +33,27 @@ if(isset($_POST['ref_form_list'])){
 					$url = 'https://app.docscloud.io/f/embed/'.$val['form_code'];
 					//$embed_url = '<link rel="stylesheet" href="https://app.docscloud.io/css/bootstrap.min.css"><div class="embed-responsive embed-responsive-1by1"><embed class="embed-responsive-item"  src="'.$url.'" ></embed></div>';
 					$embed_url = '';
-					$form_id = $val['id'];
-					$form_name = $val['form_name'];
-					$form_code = $val['form_code'];
-					$form_url = $val['custom_submit_url'];
+					$form_id = esc_attr( $val['id'] );
+					$form_name = esc_attr( $val['form_name'] );
+					$form_code = esc_attr( $val['form_code'] );
+					$form_url = esc_attr( $val['custom_submit_url'] );
 					$form_embded_code = $embed_url;
 					$short_code = '[docscloud_form form_code="'.$form_code.'"]';
-					$entriesListget = $wpdb->get_results("SELECT * FROM ".$tablename." where form_code =".$form_code."");
+					$entriesListget = $wpdb->get_results($wpdb->prepare("SELECT * FROM $tablename where form_code ='%s'",$form_code));
 					if(count($entriesListget) == 0){
-						$insert_sql = "INSERT INTO ".$tablename."(form_id, form_name, form_code, form_url, form_embded_code, short_code) values('".$form_id."','".$form_name."','".$form_code."','".$form_url."','".$form_embded_code."','".$short_code."') ";
-						$wpdb->query($insert_sql);
+
+						$data = array(
+							'form_id' => $form_id, 
+							'form_name' => $form_name,
+							'form_code'=> $form_code,
+							'form_url'=> $form_url,
+							'form_embded_code'=> $form_embded_code,
+							'short_code'=>$short_code
+						);
+						$format = array('%d','%s','%s','%s','%s','%s');
+						$wpdb->insert($tablename,$data,$format);
+						// $insert_sql = "INSERT INTO ".$tablename."(form_id, form_name, form_code, form_url, form_embded_code, short_code) values('".$form_id."','".$form_name."','".$form_code."','".$form_url."','".$form_embded_code."','".$short_code."') ";
+						// $wpdb->query($insert_sql);
 						//echo "Authentication save sucessfully.";
 					}
 				}
@@ -59,11 +70,17 @@ if(isset($_POST['ref_form_list'])){
 
 // Delete record
 if(isset($_GET['delid'])){
-	$delid = $_GET['delid'];
+	$delid = esc_attr($_GET['delid']);
 	if ( ! ctype_alnum( $delid ) ) {
 		wp_die( "Invalid format" );
 	}
-	$wpdb->query("DELETE FROM ".$tablename." WHERE id=".$delid);
+	
+	$wpdb->delete(
+		$wpdb->$tablename, 		// table name with dynamic prefix
+		['id' => $delid], 						// which id need to delete
+		['%d'], 							// make sure the id format
+);
+	// $wpdb->query("DELETE FROM ".$tablename." WHERE id=".$delid);
 }
 ?>
 <div class="wrap">	
@@ -86,7 +103,7 @@ if(isset($_GET['delid'])){
 	<tbody>
 		<?php
 		// Select records
-		$entriesList = $wpdb->get_results("SELECT * FROM ".$tablename." order by id desc");
+		$entriesList = $wpdb->get_results($wpdb->prepare("SELECT * FROM $tablename order by id desc"));
 		if(count($entriesList) > 0){
 			$count = 1;
 			foreach($entriesList as $entry){

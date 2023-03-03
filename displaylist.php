@@ -5,11 +5,16 @@ $tablename = $wpdb->prefix."docscloud";
 
 // Delete record
 if(isset($_GET['delid'])){
-	$delid = $_GET['delid'];
+	$delid = esc_attr( $_GET['delid'] );
 	if ( ! ctype_alnum( $delid ) ) {
 		wp_die( "Invalid format" );
 	}
-	$wpdb->query("DELETE FROM ".$tablename." WHERE id=".$delid);
+	$wpdb->delete(
+		$wpdb->$tablename, 		// table name with dynamic prefix
+		['id' => $delid], 						// which id need to delete
+		['%d'], 							// make sure the id format
+);
+	// $wpdb->query("DELETE FROM ".$tablename." WHERE id=".$delid);
 }
 ?>
 <div class="wrap">
@@ -29,7 +34,8 @@ if(isset($_GET['delid'])){
 	<tbody>
 		<?php
 		// Select records
-		$entriesList = $wpdb->get_results("SELECT * FROM ".$tablename." order by id desc");
+		
+		$entriesList = $wpdb->get_results($wpdb->prepare("SELECT * FROM $tablename order by id desc"));
 		if(count($entriesList) > 0){
 			$count = 1;
 			foreach($entriesList as $entry){
