@@ -70,13 +70,13 @@ if(isset($_POST['ref_form_list'])){
 
 // Delete record
 if(isset($_GET['delid'])){
-	$delid = esc_attr($_GET['delid']);
+	$delid = sanitize_text_field($_GET['delid']);
 	if ( ! ctype_alnum( $delid ) ) {
 		wp_die( "Invalid format" );
 	}
 	
 	$wpdb->delete(
-		$wpdb->$tablename, 		// table name with dynamic prefix
+		$tablename, 		// table name with dynamic prefix
 		['id' => $delid], 						// which id need to delete
 		['%d'], 							// make sure the id format
 );

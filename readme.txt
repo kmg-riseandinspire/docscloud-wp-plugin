@@ -6,7 +6,7 @@ Author: Rise & Inspire Techlabs LLP
 Contributors: Satish Hsarma, Bhawana
 Tags: Doscloud forms, Doscloud, forms, embed form, free form builder, form builder
 Requires at least: 3.0.1
-Tested up to: 6.0
+Tested up to: 6.1.1
 Stable tag: 1.0.0
 Requires PHP: 7.4.1
 License: GPLv2 or later
